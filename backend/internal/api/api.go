@@ -35,6 +35,7 @@ type Poll struct { ID bson.ObjectID `bson:"_id,omitempty" json:"id"`;
  OwnerID bson.ObjectID `bson:"ownerId" json:"-"`;
  Title string `bson:"title" json:"title"`;
  Description string `bson:"description" json:"description"`;
+ Category string `bson:"category,omitempty" json:"category"`;
  Options []Option `bson:"options" json:"options"`;
  Closed bool `bson:"closed" json:"closed"`;
  CreatedAt time.Time `bson:"createdAt" json:"createdAt"` }
@@ -141,15 +142,19 @@ return};
 c.JSON(200,gin.H{"token":s.token(user.ID),"user":user})}
 func(s *Server) create(c *gin.Context){var in struct{Title string `json:"title"`;
 Description string `json:"description"`;
+Category string `json:"category"`;
 Options []string `json:"options"`};
 if c.ShouldBindJSON(&in)!=nil{fail(c,400,"Invalid poll data");
 return};
 in.Title=strings.TrimSpace(in.Title);
 in.Description=strings.TrimSpace(in.Description);
+if in.Category=="" { in.Category="general" };
+validCategories:=map[string]bool{"general":true,"technology":true,"entertainment":true,"sports":true,"education":true,"lifestyle":true,"business":true};
+if !validCategories[in.Category] { fail(c,400,"Choose a valid category"); return };
 if len(in.Title)<5||len(in.Title)>160||len(in.Description)>500||len(in.Options)<2||len(in.Options)>8{fail(c,400,"Title must be 5–160 characters and there must be 2–8 options");
 return};
 seen:=map[string]bool{};
-poll:=Poll{ID:bson.NewObjectID(),OwnerID:c.MustGet("userID").(bson.ObjectID),Title:in.Title,Description:in.Description,CreatedAt:time.Now().UTC(),Options:[]Option{}};
+poll:=Poll{ID:bson.NewObjectID(),OwnerID:c.MustGet("userID").(bson.ObjectID),Title:in.Title,Description:in.Description,Category:in.Category,CreatedAt:time.Now().UTC(),Options:[]Option{}};
 for _,v:=range in.Options{v=strings.TrimSpace(v);
 k:=strings.ToLower(v);
 if len(v)<1||len(v)>100||seen[k]{fail(c,400,"Options must be unique and 1–100 characters");

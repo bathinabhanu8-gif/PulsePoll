@@ -1,6 +1,6 @@
 # PulsePoll
 
-A live poll application built with React, Go/Gin, MongoDB and Redis. Create an account, publish a poll, send its link, vote, and watch the results update across connected browsers.
+A live poll application built with React, Go/Gin, MongoDB and Redis. Create an account, choose a category, publish a poll, send its link, vote, and watch the participant count and results update across connected browsers.
 
 ## Architecture
 
@@ -35,6 +35,8 @@ A live poll application built with React, Go/Gin, MongoDB and Redis. Create an a
 5. Visit `http://localhost:5173`. Create an account and a poll; open its share link in two different browsers. Vote in one and observe the other update without refresh.
 
 If port 8081 is occupied, stop the previous Go backend before starting the new one. The production service should set `GIN_MODE=release`.
+
+New polls can be themed as General, Technology, Entertainment, Sports, Education, Lifestyle, or Business. Existing polls without a category appear as General. Each poll shows its own participant count; the dashboard also summarizes votes across the owner's polls. A participant is counted by a successfully recorded vote for that poll, not by a verified human identity.
 
 ## API
 
